@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Salary Calculator | College Practical Project</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-calculator"></i>
+                <div>
+                    <h1>Salary Calculator</h1>
+                    <p class="subtitle">Quick & Accurate Employee Payroll Calculation</p>
+                </div>
+            </div>
+            <div class="academic-badge">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <main class="main-content">
+            <!-- Left Side: Form Section -->
+            <section class="card form-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-pen-to-square"></i> Input Details</h2>
+                    <span class="currency-selector-wrapper">
+                        <label for="currencySelect"><i class="fa-solid fa-globe"></i> Currency:</label>
+                        <select id="currencySelect" class="currency-select">
+                            <option value="₹" selected>₹ (INR)</option>
+                            <option value="$">$ (USD)</option>
+                            <option value="€">€ (EUR)</option>
+                            <option value="£">£ (GBP)</option>
+                        </select>
+                    </span>
+                </div>
+
+                <form id="salaryForm" novalidate>
+                    <!-- Employee Name Input -->
+                    <div class="form-group">
+                        <label for="employeeName">
+                            <i class="fa-solid fa-user"></i> Employee Name <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="employeeName" 
+                            placeholder="e.g. John Doe"
+                            autocomplete="off"
+                        >
+                        <small class="error-msg" id="nameError"></small>
+                    </div>
+
+                    <!-- Basic Salary Input -->
+                    <div class="form-group">
+                        <label for="basicSalary">
+                            <i class="fa-solid fa-money-bill-wave"></i> Basic Salary <span class="required">*</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <span class="currency-symbol">₹</span>
+                            <input 
+                                type="number" 
+                                id="basicSalary" 
+                                placeholder="e.g. 45000"
+                                min="0"
+                                step="any"
+                            >
+                        </div>
+                        <small class="error-msg" id="basicError"></small>
+                    </div>
+
+                    <!-- Allowances Input -->
+                    <div class="form-group">
+                        <label for="allowances">
+                            <i class="fa-solid fa-circle-plus"></i> Allowances (HRA, DA, etc.) <span class="required">*</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <span class="currency-symbol">₹</span>
+                            <input 
+                                type="number" 
+                                id="allowances" 
+                                placeholder="e.g. 12000 (Enter 0 if none)"
+                                min="0"
+                                step="any"
+                            >
+                        </div>
+                        <small class="error-msg" id="allowancesError"></small>
+                    </div>
+
+                    <!-- Deductions Input -->
+                    <div class="form-group">
+                        <label for="deductions">
+                            <i class="fa-solid fa-circle-minus"></i> Deductions (Tax, PF, etc.) <span class="required">*</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <span class="currency-symbol">₹</span>
+                            <input 
+                                type="number" 
+                                id="deductions" 
+                                placeholder="e.g. 5000 (Enter 0 if none)"
+                                min="0"
+                                step="any"
+                            >
+                        </div>
+                        <small class="error-msg" id="deductionsError"></small>
+                    </div>
+
+                    <!-- Form Buttons -->
+                    <div class="button-group">
+                        <button type="submit" id="calculateBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-calculator"></i> Calculate Salary
+                        </button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">
+                            <i class="fa-solid fa-rotate-left"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Right Side: Results Section -->
+            <section class="card result-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-receipt"></i> Calculation Results</h2>
+                    <span id="timestamp" class="timestamp"></span>
+                </div>
+
+                <!-- Empty State Message -->
+                <div id="emptyState" class="empty-state">
+                    <i class="fa-solid fa-chart-pie placeholder-icon"></i>
+                    <h3>No Calculation Yet</h3>
+                    <p>Enter employee details and click <strong>"Calculate Salary"</strong> to generate the salary breakdown payslip.</p>
+                </div>
+
+                <!-- Results Output Display -->
+                <div id="resultContent" class="result-content hidden">
+                    <div class="employee-badge">
+                        <i class="fa-solid fa-id-badge"></i>
+                        <div>
+                            <span class="badge-label">Employee</span>
+                            <h3 id="resEmployeeName">--</h3>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Cards -->
+                    <div class="metrics-grid">
+                        <div class="metric-card gross">
+                            <span class="metric-title"><i class="fa-solid fa-arrow-up-right-dots"></i> Gross Salary</span>
+                            <h4 id="resGrossSalary">₹0.00</h4>
+                            <p class="metric-formula">Basic + Allowances</p>
+                        </div>
+
+                        <div class="metric-card deduction">
+                            <span class="metric-title"><i class="fa-solid fa-arrow-down-left-dots"></i> Deductions</span>
+                            <h4 id="resDeductions">₹0.00</h4>
+                            <p class="metric-formula">Tax & Retainers</p>
+                        </div>
+
+                        <div class="metric-card net highlight">
+                            <span class="metric-title"><i class="fa-solid fa-wallet"></i> Net Take-Home Salary</span>
+                            <h4 id="resNetSalary">₹0.00</h4>
+                            <p class="metric-formula">Gross - Deductions</p>
+                        </div>
+                    </div>
+
+                    <!-- Visual Progress Bar Breakdown -->
+                    <div class="breakdown-visual">
+                        <div class="breakdown-header">
+                            <span>Salary Structure Visual Breakdown</span>
+                            <span id="takeHomePercent">100% Take Home</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="barBasic" class="progress-segment basic" title="Basic Salary"></div>
+                            <div id="barAllowances" class="progress-segment allowance" title="Allowances"></div>
+                            <div id="barDeductions" class="progress-segment deduction" title="Deductions"></div>
+                        </div>
+                        <div class="legend">
+                            <span class="legend-item"><span class="dot basic"></span> Basic (<span id="basicPct">0%</span>)</span>
+                            <span class="legend-item"><span class="dot allowance"></span> Allowances (<span id="allowancePct">0%</span>)</span>
+                            <span class="legend-item"><span class="dot deduction"></span> Deductions (<span id="deductionPct">0%</span>)</span>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Table -->
+                    <div class="table-responsive">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Calculation</th>
+                                    <th class="text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><i class="fa-solid fa-coins icon-basic"></i> Basic Salary</td>
+                                    <td>Base Pay</td>
+                                    <td class="text-right" id="tblBasic">₹0.00</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-solid fa-plus-circle icon-allowance"></i> Allowances</td>
+                                    <td>Additional Benefits</td>
+                                    <td class="text-right" id="tblAllowances">+ ₹0.00</td>
+                                </tr>
+                                <tr class="subtotal-row">
+                                    <td><strong>Gross Salary</strong></td>
+                                    <td>Basic + Allowances</td>
+                                    <td class="text-right" id="tblGross"><strong>₹0.00</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-solid fa-minus-circle icon-deduction"></i> Total Deductions</td>
+                                    <td>Taxes & Contributions</td>
+                                    <td class="text-right negative" id="tblDeductions">- ₹0.00</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td><strong>Net Salary</strong></td>
+                                    <td>Gross - Deductions</td>
+                                    <td class="text-right net-amount" id="tblNet"><strong>₹0.00</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Action Buttons for Payslip -->
+                    <div class="action-buttons">
+                        <button id="printBtn" class="btn btn-outline">
+                            <i class="fa-solid fa-print"></i> Print Payslip
+                        </button>
+                        <button id="saveHistoryBtn" class="btn btn-outline">
+                            <i class="fa-solid fa-bookmark"></i> Save Record
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Calculation History Section -->
+        <section class="card history-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-history"></i> Recent Calculation History</h2>
+                <button id="clearHistoryBtn" class="btn btn-sm btn-outline-danger">
+                    <i class="fa-solid fa-trash-can"></i> Clear History
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Employee Name</th>
+                            <th>Basic Salary</th>
+                            <th>Allowances</th>
+                            <th>Gross Salary</th>
+                            <th>Deductions</th>
+                            <th>Net Salary</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr class="empty-history-row">
+                            <td colspan="9" class="text-center text-muted">No saved calculations yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; Salary Calculator Web Application | HTML5 &bull; CSS3 &bull; Vanilla JavaScript</p>
+        </footer>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
